@@ -1,1 +1,90 @@
-@import "tailwindcss";
+:root {
+  --ink: #18201c;
+  --paper: #f5f0e7;
+  --card: #fffdf7;
+  --moss: #385747;
+  --coral: #d76b4a;
+  --line: #d8d1c5;
+}
+
+* { box-sizing: border-box; }
+
+html { background: var(--paper); color: var(--ink); }
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background:
+    radial-gradient(circle at 85% 5%, rgba(215,107,74,.14), transparent 24rem),
+    var(--paper);
+}
+
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
+
+.site-header {
+  max-width: 1180px;
+  margin: auto;
+  min-height: 88px;
+  padding: 1.25rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+}
+
+.wordmark { font-weight: 900; letter-spacing: -.08em; font-size: 1.65rem; }
+.wordmark span { color: var(--coral); }
+nav { display: flex; gap: 1.4rem; align-items: center; font-size: .88rem; font-weight: 700; }
+nav a:hover { color: var(--coral); }
+.admin-link { border: 1px solid var(--ink); border-radius: 99px; padding: .55rem .9rem; }
+
+main { max-width: 1180px; margin: auto; padding: 4rem 2rem 6rem; min-height: 70vh; }
+.eyebrow { color: var(--coral); font-size: .76rem; font-weight: 900; letter-spacing: .16em; text-transform: uppercase; }
+h1, h2, h3 { font-family: Georgia, "Times New Roman", serif; line-height: 1.05; }
+h1 { font-size: clamp(3rem, 8vw, 6.8rem); letter-spacing: -.065em; margin: .65rem 0 1.25rem; max-width: 950px; }
+h2 { font-size: clamp(2rem, 4vw, 3.5rem); letter-spacing: -.04em; }
+.lede { max-width: 660px; font-size: 1.15rem; line-height: 1.7; color: #526058; }
+.hero { padding-bottom: 4rem; border-bottom: 1px solid var(--line); }
+.section-heading { display: flex; justify-content: space-between; align-items: end; margin: 3rem 0 1.5rem; }
+.section-heading h2 { margin: 0; }
+.count { color: #6d766f; font-size: .85rem; }
+
+.post-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 1.5rem; }
+.post-card { grid-column: span 6; background: var(--card); border: 1px solid var(--line); overflow: hidden; transition: transform .2s; }
+.post-card:first-child { grid-column: span 12; display: grid; grid-template-columns: 1.2fr 1fr; }
+.post-card:hover { transform: translateY(-4px); }
+.post-image { position: relative; min-height: 260px; background: #dfe5df; }
+.post-image img { object-fit: cover; }
+.post-copy { padding: 1.8rem; }
+.post-copy h2, .post-copy h3 { margin: .55rem 0 .8rem; font-size: 2rem; }
+.post-card:first-child h2 { font-size: clamp(2.3rem, 4vw, 4.4rem); }
+.post-copy p { color: #59635d; line-height: 1.65; }
+.meta { font-size: .75rem; text-transform: uppercase; letter-spacing: .1em; color: #777; }
+
+.gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-top: 3rem; }
+.gallery-item { background: var(--card); border: 1px solid var(--line); }
+.gallery-item img { width: 100%; aspect-ratio: 4/3; object-fit: cover; }
+.gallery-item figcaption { padding: 1rem; line-height: 1.5; }
+.video-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 3rem; }
+.video-card iframe { border: 0; width: 100%; aspect-ratio: 16/9; }
+.video-card h2 { font-size: 1.7rem; }
+
+.article { max-width: 800px; }
+.article-cover { width: 100%; max-height: 560px; object-fit: cover; margin: 2.5rem 0; }
+.article-body { font-family: Georgia, serif; font-size: 1.25rem; line-height: 1.9; white-space: pre-wrap; }
+.back { display: inline-block; margin-bottom: 2rem; color: var(--moss); font-weight: 700; }
+.empty { padding: 4rem; border: 1px dashed #aaa; text-align: center; color: #68716b; }
+
+footer { max-width: 1180px; margin: auto; border-top: 1px solid var(--line); padding: 2rem; display: flex; justify-content: space-between; font-size: .8rem; color: #69736c; }
+
+.skeleton { background: linear-gradient(90deg,#e1ddd4 25%,#eeeae2 50%,#e1ddd4 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; min-height: 280px; }
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+@media (max-width: 720px) {
+  .site-header { align-items: flex-start; gap: 1rem; }
+  nav { flex-wrap: wrap; justify-content: flex-end; gap: .7rem; }
+  .post-card, .post-card:first-child { grid-column: span 12; display: block; }
+  .gallery-grid, .video-grid { grid-template-columns: 1fr; }
+  main { padding: 2.5rem 1.2rem 4rem; }
+}
