@@ -29,5 +29,5 @@
     "typescript": "^5",
     "vercel": "^56.5.0"
   },
-  "packageManager": "bun@1.1.30"
+  "packageManager": "pnpm@11.9.0"
 }
