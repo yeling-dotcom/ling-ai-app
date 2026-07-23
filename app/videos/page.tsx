@@ -1,9 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
+import { logPageView } from "@/lib/analytics";
 
 export const metadata = { title: "Watch", description: "Videos about creativity, work, and technology." };
 export const dynamic = "force-dynamic";
 
 export default async function VideosPage() {
+  await logPageView("/videos");
   const supabase = await createClient();
   const { data: videos, error } = await supabase.from("videos").select("*").is("deleted_at", null).order("created_at", { ascending: false });
   return <main><p className="eyebrow">Watch & listen</p><h1>Ideas in motion.</h1><p className="lede">Studio notes, practical walkthroughs, and conversations.</p>

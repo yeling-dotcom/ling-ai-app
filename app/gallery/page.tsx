@@ -1,10 +1,12 @@
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
+import { logPageView } from "@/lib/analytics";
 
 export const metadata = { title: "Gallery", description: "A visual notebook of places and moments." };
 export const dynamic = "force-dynamic";
 
 export default async function GalleryPage() {
+  await logPageView("/gallery");
   const supabase = await createClient();
   const { data: images, error } = await supabase.from("images").select("*").is("deleted_at", null).order("created_at", { ascending: false });
   return <main>

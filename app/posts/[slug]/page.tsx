@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { logPageView } from "@/lib/analytics";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +21,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function PostPage({ params }: Props) {
-  const post = await getPost((await params).slug);
+  const { slug } = await params;
+  await logPageView(`/posts/${slug}`);
+  const post = await getPost(slug);
   if (!post) notFound();
   return <main><article className="article">
     <Link className="back" href="/">← All stories</Link>

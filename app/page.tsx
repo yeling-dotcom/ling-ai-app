@@ -1,10 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { logPageView } from "@/lib/analytics";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
+  await logPageView("/");
   const supabase = await createClient();
   const { data: posts, error } = await supabase
     .from("posts")

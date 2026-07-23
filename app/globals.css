@@ -70,6 +70,24 @@ h2 { font-size: clamp(2rem, 4vw, 3.5rem); letter-spacing: -.04em; }
 .video-card iframe { border: 0; width: 100%; aspect-ratio: 16/9; }
 .video-card h2 { font-size: 1.7rem; }
 
+.contact-layout { display: grid; grid-template-columns: .9fr 1.1fr; gap: 5rem; align-items: start; }
+.contact-form { background: var(--card); border: 1px solid var(--line); padding: 2rem; display: grid; gap: 1.2rem; }
+.contact-form label { display: grid; gap: .5rem; font-weight: 800; font-size: .85rem; }
+.contact-form input, .contact-form textarea {
+  width: 100%; border: 1px solid #bdb7ab; border-radius: 0; background: #fff;
+  color: var(--ink); padding: .9rem 1rem; font: inherit;
+}
+.contact-form input:focus, .contact-form textarea:focus { outline: 2px solid var(--moss); outline-offset: 2px; }
+.contact-form [aria-invalid="true"] { border-color: #a43f2d; }
+.contact-form small { min-height: 1em; color: #a43f2d; font-weight: 500; }
+.primary-button, .success-card button, .empty button {
+  border: 0; background: var(--ink); color: white; padding: 1rem 1.3rem; font-weight: 900; cursor: pointer;
+}
+.primary-button:disabled { opacity: .55; cursor: wait; }
+.form-error { color: #a43f2d; }
+.success-card { background: var(--card); border: 1px solid var(--line); padding: 3rem; text-align: center; }
+.success-card span { display: inline-grid; place-items: center; width: 3rem; height: 3rem; border-radius: 50%; background: var(--moss); color: white; }
+
 .article { max-width: 800px; }
 .article-cover { width: 100%; max-height: 560px; object-fit: cover; margin: 2.5rem 0; }
 .article-body { font-family: Georgia, serif; font-size: 1.25rem; line-height: 1.9; white-space: pre-wrap; }
@@ -86,5 +104,6 @@ footer { max-width: 1180px; margin: auto; border-top: 1px solid var(--line); pad
   nav { flex-wrap: wrap; justify-content: flex-end; gap: .7rem; }
   .post-card, .post-card:first-child { grid-column: span 12; display: block; }
   .gallery-grid, .video-grid { grid-template-columns: 1fr; }
+  .contact-layout { grid-template-columns: 1fr; gap: 2rem; }
   main { padding: 2.5rem 1.2rem 4rem; }
 }
