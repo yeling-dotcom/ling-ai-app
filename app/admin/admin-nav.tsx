@@ -7,6 +7,8 @@ export function AdminNav() {
     <Link href="/admin/images">Images</Link>
     <Link href="/admin/videos">Videos</Link>
     <Link href="/admin/messages">Messages</Link>
+    <Link href="/admin/analytics">Analytics</Link>
     <Link href="/">View site ↗</Link>
+    <form action="/auth/signout" method="post"><button className="nav-button">Sign out</button></form>
   </aside>;
 }

@@ -12,7 +12,7 @@ export async function updateSession(request: NextRequest) {
   // are required", crashing the edge middleware on every route (500
   // MIDDLEWARE_INVOCATION_FAILED).
   if (!url || !anonKey) {
-    return supabaseResponse;
+    return { response: supabaseResponse, user: null };
   }
 
   try {
@@ -35,10 +35,10 @@ export async function updateSession(request: NextRequest) {
     });
 
     // Refresh session so it doesn't expire while user is active
-    await supabase.auth.getUser();
-    return response;
+    const { data: { user } } = await supabase.auth.getUser();
+    return { response, user };
   } catch {
     // Never let an auth hiccup crash the entire edge middleware
-    return supabaseResponse;
+    return { response: supabaseResponse, user: null };
   }
 }
