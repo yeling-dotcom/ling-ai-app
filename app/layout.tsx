@@ -3,11 +3,14 @@ import Link from "next/link";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
   title: {
     default: "Ling — Notes on creativity and technology",
     template: "%s · Ling",
   },
   description: "Writing, images, and experiments from Ling.",
+  openGraph: { type: "website", siteName: "Ling", title: "Ling — Notes on creativity and technology", description: "Writing, images, and experiments from Ling." },
+  twitter: { card: "summary_large_image", title: "Ling — Notes on creativity and technology", description: "Writing, images, and experiments from Ling." },
 };
 
 export default function RootLayout({

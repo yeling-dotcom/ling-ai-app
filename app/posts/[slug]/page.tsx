@@ -25,6 +25,8 @@ export default async function PostPage({ params }: Props) {
   await logPageView(`/posts/${slug}`);
   const post = await getPost(slug);
   if (!post) notFound();
+  const supabase = await createClient();
+  const { data: viewCount } = await supabase.rpc("post_view_count", { requested_path: `/posts/${slug}` });
   return <main><article className="article">
     <Link className="back" href="/">← All stories</Link>
     <p className="eyebrow">Journal</p>
@@ -32,6 +34,7 @@ export default async function PostPage({ params }: Props) {
     <p className="meta">{post.published_at && new Date(post.published_at).toLocaleDateString("en-MY", { dateStyle: "long" })}</p>
     {post.cover_image_url && <Image className="article-cover" src={post.cover_image_url} width={1200} height={720} alt="" priority />}
     <div className="article-body">{post.body}</div>
+    <p className="view-count">{viewCount ?? 0} views</p>
     {post.ai_tags_review_status === "accepted" && post.ai_tags?.length ? <div>{post.ai_tags.map((tag: string) => <span className="admin-link" key={tag}>{tag}</span>)}</div> : null}
   </article></main>;
 }
