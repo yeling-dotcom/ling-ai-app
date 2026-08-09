@@ -2,7 +2,6 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 
 export function LoginForm() {
   const router = useRouter();
@@ -14,14 +13,26 @@ export function LoginForm() {
     event.preventDefault();
     setLoading(true); setError("");
     const form = new FormData(event.currentTarget);
-    const { error: signInError } = await createClient().auth.signInWithPassword({
-      email: String(form.get("email") ?? ""),
-      password: String(form.get("password") ?? ""),
-    });
-    if (signInError) { setError("Email or password is incorrect."); setLoading(false); return; }
-    const next = searchParams.get("next");
-    router.replace(next?.startsWith("/admin") ? next : "/admin/posts");
-    router.refresh();
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 12_000);
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email: form.get("email"), password: form.get("password") }),
+        signal: controller.signal,
+      });
+      const result = await response.json();
+      if (!response.ok) { setError(result.error ?? "Sign in failed."); return; }
+      const next = searchParams.get("next");
+      router.replace(next?.startsWith("/admin") ? next : "/admin/posts");
+      router.refresh();
+    } catch {
+      setError("Sign in timed out. Please try again.");
+    } finally {
+      window.clearTimeout(timeout);
+      setLoading(false);
+    }
   }
 
   return <form className="contact-form login-form" onSubmit={submit}>
