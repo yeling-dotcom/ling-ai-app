@@ -119,6 +119,11 @@ h2 { font-size: clamp(2rem, 4vw, 3.5rem); letter-spacing: -.04em; }
 .media-admin-card { background: var(--card); border: 1px solid var(--line); padding: .8rem; }
 .media-admin-card img { width: 100%; aspect-ratio: 4/3; object-fit: cover; margin-bottom: .8rem; }
 .media-admin-card form { display: grid; gap: .65rem; }
+.ai-review { display: grid; gap: .75rem; margin-top: 1rem; padding-top: 1.5rem; border-top: 1px solid var(--line); }
+.ai-review-heading { display: flex; justify-content: space-between; gap: 1rem; align-items: center; margin-top: 1rem; }
+.ai-review-heading h3, .ai-review-heading p { margin: 0; }
+.confidence { border-radius: 99px; background: #d8eadc; color: var(--moss); padding: .35rem .65rem; font-size: .72rem; font-weight: 900; }
+.confidence.low { background: #f5d7cc; color: #8b321f; }
 
 footer { max-width: 1180px; margin: auto; border-top: 1px solid var(--line); padding: 2rem; display: flex; justify-content: space-between; font-size: .8rem; color: #69736c; }
 

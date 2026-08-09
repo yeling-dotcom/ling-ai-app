@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { generatePostIntelligence } from "@/lib/ai";
 
 function slugify(value: string) {
   return value.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -22,5 +23,15 @@ export async function POST(request: Request) {
     published_at: status === "published" ? new Date().toISOString() : null,
   }).select("*").single();
   if (error) return NextResponse.json({ error: "Post could not be saved." }, { status: 500 });
-  return NextResponse.json({ post: data }, { status: 201 });
+
+  const intelligence = await generatePostIntelligence(title, content);
+  if (!intelligence) return NextResponse.json({ post: data, ai_status: "unavailable" }, { status: 201 });
+  const { data: enriched, error: aiSaveError } = await supabase
+    .from("posts")
+    .update(intelligence)
+    .eq("id", data.id)
+    .select("*")
+    .single();
+  if (aiSaveError) console.error("Post intelligence save failed", aiSaveError.code);
+  return NextResponse.json({ post: enriched ?? data, ai_status: aiSaveError ? "save_failed" : "generated" }, { status: 201 });
 }
