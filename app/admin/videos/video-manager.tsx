@@ -22,8 +22,11 @@ export function VideoManager({ initialVideos }: { initialVideos: Video[] }) {
   }
   async function remove(id: string) {
     if (!window.confirm("Remove this video?")) return;
+    setError("");
     const response = await fetch(`/api/admin/videos/${id}`, { method: "DELETE" });
-    if (response.ok) setVideos(current => current.filter(item => item.id !== id));
+    if (response.ok) return setVideos(current => current.filter(item => item.id !== id));
+    const result = await response.json().catch(() => ({}));
+    setError(result.error ?? "The video could not be removed.");
   }
   return <><form className="admin-form compact" onSubmit={create}><label>Title<input name="title" required /></label><label>Embed URL<input name="embed_url" type="url" required /></label><label>Description<textarea name="description" rows={3} /></label><label>Thumbnail URL<input name="thumbnail_url" type="url" /></label><button className="primary-button">Add video</button>{error && <p className="form-error">{error}</p>}</form><div className="admin-list">{videos.map(video => <article className="admin-card stacked" key={video.id}><form className="admin-form compact" onSubmit={event => edit(event, video.id)}><label>Title<input name="title" defaultValue={video.title} /></label><label>Embed URL<input name="embed_url" type="url" defaultValue={video.embed_url} /></label><label>Description<textarea name="description" rows={3} defaultValue={video.description ?? ""} /></label><label>Thumbnail URL<input name="thumbnail_url" type="url" defaultValue={video.thumbnail_url ?? ""} /></label><div className="admin-actions"><button>Save</button><button type="button" className="danger" onClick={() => remove(video.id)}>Delete</button></div></form></article>)}</div>{!videos.length && <div className="empty">No videos yet.</div>}</>;
 }

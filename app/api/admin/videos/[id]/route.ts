@@ -25,7 +25,10 @@ export async function DELETE(_: Request, { params }: { params: Promise<{ id: str
   const { data: previous } = await supabase.from("videos").select("*").eq("id", id).eq("organization_id", context.organization.id).maybeSingle();
   const next = { deleted_at: new Date().toISOString(), user_id: user.id };
   const { error } = await supabase.from("videos").update(next).eq("id", id).eq("organization_id", context.organization.id);
-  if (error) return NextResponse.json({ error: "Video could not be removed." }, { status: 500 });
+  if (error) {
+    console.error("Video soft delete failed", error.code, error.message);
+    return NextResponse.json({ error: "Video could not be removed." }, { status: 500 });
+  }
   await logAudit(supabase, { action: "soft_delete", table_name: "videos", organization_id: context.organization.id, row_id: id, actor_user_id: user.id, old_value: previous, new_value: next });
   return NextResponse.json({ ok: true });
 }
