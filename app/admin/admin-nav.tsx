@@ -8,6 +8,11 @@ export function AdminNav() {
     <Link href="/admin/videos">Videos</Link>
     <Link href="/admin/messages">Messages</Link>
     <Link href="/admin/analytics">Analytics</Link>
+    <Link href="/admin/reviews">AI reviews</Link>
+    <Link href="/admin/team">Team</Link>
+    <Link href="/admin/settings">Settings</Link>
+    <Link href="/admin/billing">Billing</Link>
+    <Link href="/admin/organizations">Organizations</Link>
     <Link href="/">View site ↗</Link>
     <form action="/auth/signout" method="post"><button className="nav-button">Sign out</button></form>
   </aside>;

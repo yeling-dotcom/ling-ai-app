@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getPublicOrganization } from "@/lib/organization";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -13,28 +14,31 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title: "Ling — Notes on creativity and technology", description: "Writing, images, and experiments from Ling." },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const publicOrganization = await getPublicOrganization();
+  const settings = publicOrganization?.settings;
+  const siteName = publicOrganization?.organization.name ?? "Ling";
   return (
     <html lang="en">
-      <body>
+      <body data-theme={settings?.theme ?? "editorial"}>
         <header className="site-header">
-          <Link className="wordmark" href="/">LING<span>.</span></Link>
+          <Link className="wordmark" href="/">{siteName.toUpperCase()}<span>.</span></Link>
           <nav aria-label="Main navigation">
             <Link href="/">Journal</Link>
-            <Link href="/gallery">Gallery</Link>
-            <Link href="/videos">Watch</Link>
-            <Link href="/contact">Contact</Link>
+            {settings?.gallery_enabled !== false && <Link href="/gallery">Gallery</Link>}
+            {settings?.videos_enabled !== false && <Link href="/videos">Watch</Link>}
+            {settings?.contact_enabled !== false && <Link href="/contact">Contact</Link>}
             <Link className="admin-link" href="/admin/posts">Studio</Link>
           </nav>
         </header>
         {children}
         <footer>
           <p>Made thoughtfully in Kuala Lumpur.</p>
-          <p>© {new Date().getFullYear()} Ling</p>
+          <p>© {new Date().getFullYear()} {siteName}</p>
         </footer>
       </body>
     </html>

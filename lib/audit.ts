@@ -5,6 +5,7 @@ export async function logAudit(
   entry: {
     action: string;
     table_name: string;
+    organization_id?: string | null;
     row_id?: string | null;
     actor_user_id?: string | null;
     old_value?: unknown;

@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { generatePostIntelligence } from "@/lib/ai";
 import { requireUser } from "@/lib/auth";
 import { logAudit } from "@/lib/audit";
+import { getOrganizationForUser } from "@/lib/organization";
+import { createReviewTasks } from "@/lib/reviews";
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const body = await request.json();
@@ -13,12 +15,14 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   }
   const { supabase, user } = await requireUser();
   if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+  const context = await getOrganizationForUser();
+  if (!context) return NextResponse.json({ error: "Organization membership required." }, { status: 403 });
   const id = (await params).id;
-  const { data: previous } = await supabase.from("posts").select("*").eq("id", id).maybeSingle();
+  const { data: previous } = await supabase.from("posts").select("*").eq("id", id).eq("organization_id", context.organization.id).maybeSingle();
   update.user_id = user.id;
-  const { data, error } = await supabase.from("posts").update(update).eq("id", id).select("*").single();
+  const { data, error } = await supabase.from("posts").update(update).eq("id", id).eq("organization_id", context.organization.id).select("*").single();
   if (error) return NextResponse.json({ error: "Post could not be updated." }, { status: 500 });
-  await logAudit(supabase, { action: data.status !== previous?.status ? `status:${data.status}` : "update", table_name: "posts", row_id: data.id, actor_user_id: user.id, old_value: previous, new_value: data });
+  await logAudit(supabase, { action: data.status !== previous?.status ? `status:${data.status}` : "update", table_name: "posts", organization_id: context.organization.id, row_id: data.id, actor_user_id: user.id, old_value: previous, new_value: data });
 
   const contentChanged = Object.prototype.hasOwnProperty.call(body, "body") || Object.prototype.hasOwnProperty.call(body, "title");
   if (!contentChanged) return NextResponse.json({ post: data });
@@ -26,17 +30,20 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   if (!intelligence) return NextResponse.json({ post: data, ai_status: "unavailable" });
   const { data: enriched, error: aiSaveError } = await supabase.from("posts").update(intelligence).eq("id", data.id).select("*").single();
   if (aiSaveError) console.error("Post intelligence save failed", aiSaveError.code);
+  if (!aiSaveError && context.organization.plan === "pro" && context.settings.ai_review_enabled) await createReviewTasks(supabase, context.organization.id, data.id, intelligence);
   return NextResponse.json({ post: enriched ?? data, ai_status: aiSaveError ? "save_failed" : "generated" });
 }
 
 export async function DELETE(_: Request, { params }: { params: Promise<{ id: string }> }) {
   const { supabase, user } = await requireUser();
   if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+  const context = await getOrganizationForUser();
+  if (!context) return NextResponse.json({ error: "Organization membership required." }, { status: 403 });
   const id = (await params).id;
-  const { data: previous } = await supabase.from("posts").select("*").eq("id", id).maybeSingle();
+  const { data: previous } = await supabase.from("posts").select("*").eq("id", id).eq("organization_id", context.organization.id).maybeSingle();
   const next = { deleted_at: new Date().toISOString(), user_id: user.id };
-  const { error } = await supabase.from("posts").update(next).eq("id", id);
+  const { error } = await supabase.from("posts").update(next).eq("id", id).eq("organization_id", context.organization.id);
   if (error) return NextResponse.json({ error: "Post could not be removed." }, { status: 500 });
-  await logAudit(supabase, { action: "soft_delete", table_name: "posts", row_id: id, actor_user_id: user.id, old_value: previous, new_value: next });
+  await logAudit(supabase, { action: "soft_delete", table_name: "posts", organization_id: context.organization.id, row_id: id, actor_user_id: user.id, old_value: previous, new_value: next });
   return NextResponse.json({ ok: true });
 }

@@ -1,5 +1,5 @@
 import { constructWebhookEvent } from "@/lib/stripe";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   try {
     switch (event.type) {
@@ -40,26 +40,14 @@ export async function POST(request: Request) {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
         const userId = session.metadata?.userId;
-        if (!userId) break;
+        const organizationId = session.metadata?.organizationId;
+        if (!userId || !organizationId) break;
 
         // Store Stripe customer ID on profile for future portal/checkout calls
         if (session.customer) {
-          await supabase
-            .from("profiles")
-            .update({ stripe_customer_id: session.customer as string })
-            .eq("id", userId);
+          await supabase.from("organizations").update({ stripe_customer_id: session.customer as string }).eq("id", organizationId).eq("owner_user_id", userId);
         }
 
-        // If subscription, the subscription.updated event will handle status
-        if (session.mode === "payment") {
-          await supabase.from("purchases").upsert({
-            user_id: userId,
-            stripe_customer_id: session.customer,
-            stripe_session_id: session.id,
-            amount_total: session.amount_total,
-            status: "paid",
-          });
-        }
         break;
       }
 
@@ -67,12 +55,12 @@ export async function POST(request: Request) {
       case "customer.subscription.updated":
       case "customer.subscription.created": {
         const sub = event.data.object as Stripe.Subscription;
-        const userId = sub.metadata?.userId;
-        if (!userId) break;
+        const organizationId = sub.metadata?.organizationId;
+        if (!organizationId) break;
 
         await supabase.from("subscriptions").upsert({
           id: sub.id,
-          user_id: userId,
+          organization_id: organizationId,
           stripe_customer_id: sub.customer as string,
           status: sub.status,
           price_id: sub.items.data[0]?.price.id,
@@ -80,6 +68,8 @@ export async function POST(request: Request) {
           cancel_at_period_end: sub.cancel_at_period_end,
           updated_at: new Date().toISOString(),
         });
+        const isPro = ["active", "trialing"].includes(sub.status);
+        await supabase.from("organizations").update({ plan: isPro ? "pro" : "free", updated_at: new Date().toISOString() }).eq("id", organizationId);
         break;
       }
 
@@ -90,6 +80,8 @@ export async function POST(request: Request) {
           .from("subscriptions")
           .update({ status: "canceled", updated_at: new Date().toISOString() })
           .eq("id", sub.id);
+        const organizationId = sub.metadata?.organizationId;
+        if (organizationId) await supabase.from("organizations").update({ plan: "free", updated_at: new Date().toISOString() }).eq("id", organizationId);
         break;
       }
 

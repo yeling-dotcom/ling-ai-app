@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { AdminNav } from "../admin-nav";
+import { getOrganizationForUser } from "@/lib/organization";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Analytics" };
@@ -8,10 +9,12 @@ type EventRow = { page_path: string; created_at: string };
 
 export default async function AnalyticsPage() {
   const supabase = await createClient();
+  const context = await getOrganizationForUser();
   const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
   const { data, error } = await supabase
     .from("visitor_events")
     .select("page_path,created_at")
+    .eq("organization_id", context!.organization.id)
     .gte("created_at", since)
     .order("created_at", { ascending: false })
     .limit(5000);

@@ -35,3 +35,14 @@
 - Logged-out browser: open `/admin/posts`. **Expect:** redirect to `/login`.
 - Logged-out browser: GET `/posts/[slug]`. **Expect:** 200, full post visible.
 - Check Vercel build output: no `OPENAI_API_KEY` or `SUPABASE_SERVICE_ROLE_KEY` visible in client JS bundle.
+
+## Five-upgrade checks (Sprint 7)
+
+- Change the organization theme; hard reload and confirm it persists.
+- Disable Gallery; confirm its public navigation entry disappears and its route returns unavailable for that organization.
+- Create a second organization/member fixture; confirm neither tenant can read or mutate the other's private rows.
+- On Free, confirm a second member invitation and Pro-only theme are rejected server-side.
+- With Stripe unset, confirm publishing still works and billing shows a configuration message.
+- With Stripe test keys, complete Checkout and confirm the signed webhook changes the organization plan to Pro.
+- Invite a member, sign in with the matching email, accept the invitation, and confirm Studio access.
+- Save a post with AI enabled; confirm a review task is created and acceptance updates the public AI fields.

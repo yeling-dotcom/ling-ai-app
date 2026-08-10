@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { logPageView } from "@/lib/analytics";
+import { getPublicOrganization } from "@/lib/organization";
 
 export const dynamic = "force-dynamic";
 
@@ -11,7 +12,10 @@ type Props = { params: Promise<{ slug: string }> };
 
 async function getPost(slug: string) {
   const supabase = await createClient();
-  const { data } = await supabase.from("posts").select("*").eq("slug", slug).eq("status", "published").is("deleted_at", null).maybeSingle();
+  const publicOrganization = await getPublicOrganization();
+  let query = supabase.from("posts").select("*").eq("slug", slug).eq("status", "published").is("deleted_at", null);
+  if (publicOrganization) query = query.eq("organization_id", publicOrganization.organization.id);
+  const { data } = await query.maybeSingle();
   return data;
 }
 
@@ -22,7 +26,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PostPage({ params }: Props) {
   const { slug } = await params;
-  await logPageView(`/posts/${slug}`);
+  const publicOrganization = await getPublicOrganization();
+  await logPageView(`/posts/${slug}`, publicOrganization?.organization.id);
   const post = await getPost(slug);
   if (!post) notFound();
   const supabase = await createClient();

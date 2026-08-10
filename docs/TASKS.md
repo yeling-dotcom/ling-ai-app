@@ -101,3 +101,17 @@ Sprint 4: AI summary + tags · review UI · confidence filtering
 Sprint 5: Auth · RLS lock-down · admin route protection
 Sprint 6: Analytics · SEO · image optimisation · custom domain launch
 ```
+
+---
+
+## Sprint 7 — Five SaaS upgrades
+
+See `docs/SAAS_UPGRADES.md` for the confirmed definitions and limits.
+
+- [ ] Multi-design: three persisted organization themes
+- [ ] Multi-app: persisted module switches reflected in navigation and routes
+- [ ] Multi-tenant: organizations, memberships, tenant keys, and RLS isolation
+- [ ] Multi-tier: Free/Pro limits, Stripe Checkout, portal, and signed webhooks
+- [ ] Multi-team: email invitations, member roles, and AI review queue
+- [ ] Backfill the existing Ling owner and content without changing public URLs
+- [ ] Verify anonymous public reads, cross-tenant denial, owner-only settings, and graceful Stripe-off behavior

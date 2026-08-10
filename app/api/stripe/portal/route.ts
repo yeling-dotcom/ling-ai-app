@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { createPortalSession } from "@/lib/stripe";
 import { NextResponse } from "next/server";
+import { getOrganizationForUser } from "@/lib/organization";
 
 /**
  * POST /api/stripe/portal
@@ -19,13 +20,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("stripe_customer_id")
-      .eq("id", user.id)
-      .single();
+    const context = await getOrganizationForUser();
+    if (!context || context.role !== "owner") return NextResponse.json({ error: "Only the organization owner can manage billing." }, { status: 403 });
 
-    if (!profile?.stripe_customer_id) {
+    if (!context.organization.stripe_customer_id) {
       return NextResponse.json(
         { error: "No billing account found. Subscribe first." },
         { status: 404 },
@@ -35,8 +33,8 @@ export async function POST(request: Request) {
     const origin = request.headers.get("origin") ?? process.env.NEXT_PUBLIC_APP_URL ?? "";
 
     const portalSession = await createPortalSession({
-      customerId: profile.stripe_customer_id,
-      returnUrl: `${origin}/dashboard`,
+      customerId: context.organization.stripe_customer_id,
+      returnUrl: `${origin}/admin/billing`,
     });
 
     return NextResponse.json({ url: portalSession.url });

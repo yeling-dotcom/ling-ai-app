@@ -7,6 +7,28 @@
   --line: #d8d1c5;
 }
 
+body[data-theme="garden"] {
+  --ink: #17352b;
+  --paper: #f2f5e9;
+  --card: #fbfdf6;
+  --moss: #486b54;
+  --coral: #b05d3b;
+  --line: #cbd7c7;
+}
+
+body[data-theme="minimal"] {
+  --ink: #161616;
+  --paper: #ffffff;
+  --card: #f7f7f7;
+  --moss: #484848;
+  --coral: #2458d3;
+  --line: #dedede;
+}
+
+.tenant-site[data-theme="garden"] { --ink: #17352b; --paper: #f2f5e9; --card: #fbfdf6; --moss: #486b54; --coral: #b05d3b; --line: #cbd7c7; }
+.tenant-site[data-theme="minimal"] { --ink: #161616; --paper: #fff; --card: #f7f7f7; --moss: #484848; --coral: #2458d3; --line: #dedede; }
+.tenant-site { background: var(--paper); color: var(--ink); }
+
 * { box-sizing: border-box; }
 
 html { background: var(--paper); color: var(--ink); }

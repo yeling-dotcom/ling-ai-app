@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { getPublicOrganization } from "@/lib/organization";
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -30,7 +31,13 @@ export async function POST(request: Request) {
   if (Object.keys(errors).length) return NextResponse.json({ errors }, { status: 422 });
 
   const supabase = await createClient();
+  const requestedSlug = typeof body.organization_slug === "string" ? body.organization_slug : undefined;
+  const publicOrganization = await getPublicOrganization(requestedSlug);
+  if (publicOrganization && !publicOrganization.settings.contact_enabled) {
+    return NextResponse.json({ error: "Contact is not enabled for this site." }, { status: 404 });
+  }
   const { error } = await supabase.from("contact_messages").insert({
+    organization_id: publicOrganization?.organization.id ?? null,
     sender_name: senderName,
     sender_email: senderEmail,
     message,

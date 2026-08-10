@@ -4,7 +4,7 @@ import { FormEvent, useState } from "react";
 
 type Fields = "sender_name" | "sender_email" | "message";
 
-export function ContactForm() {
+export function ContactForm({ organizationSlug }: { organizationSlug?: string }) {
   const [errors, setErrors] = useState<Partial<Record<Fields, string>>>({});
   const [state, setState] = useState<"idle" | "sending" | "success" | "error">("idle");
 
@@ -16,6 +16,7 @@ export function ContactForm() {
       sender_name: String(data.get("sender_name") ?? "").trim(),
       sender_email: String(data.get("sender_email") ?? "").trim(),
       message: String(data.get("message") ?? "").trim(),
+      organization_slug: organizationSlug,
     };
     const nextErrors: Partial<Record<Fields, string>> = {};
     if (values.sender_name.length < 2) nextErrors.sender_name = "Please enter your name.";

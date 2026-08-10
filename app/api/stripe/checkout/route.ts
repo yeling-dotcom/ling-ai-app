@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { createCheckoutSession } from "@/lib/stripe";
 import { NextResponse } from "next/server";
+import { getOrganizationForUser } from "@/lib/organization";
 
 /**
  * POST /api/stripe/checkout
@@ -33,19 +34,18 @@ export async function POST(request: Request) {
 
     const origin = request.headers.get("origin") ?? process.env.NEXT_PUBLIC_APP_URL ?? "";
 
-    // Look up existing Stripe customer ID if stored
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("stripe_customer_id")
-      .eq("id", user.id)
-      .single();
+    const context = await getOrganizationForUser();
+    if (!context || context.role !== "owner") return NextResponse.json({ error: "Only the organization owner can manage billing." }, { status: 403 });
+    const allowedPrices = [process.env.NEXT_PUBLIC_STRIPE_PRICE_MONTHLY, process.env.NEXT_PUBLIC_STRIPE_PRICE_YEARLY].filter(Boolean);
+    if (!process.env.STRIPE_SECRET_KEY || !allowedPrices.includes(priceId)) return NextResponse.json({ error: "Stripe billing is not configured for this price." }, { status: 503 });
 
     const session = await createCheckoutSession({
       priceId,
-      customerId: profile?.stripe_customer_id ?? undefined,
+      customerId: context.organization.stripe_customer_id ?? undefined,
       userId: user.id,
-      successUrl: successUrl ?? `${origin}/dashboard?checkout=success`,
-      cancelUrl: cancelUrl ?? `${origin}/dashboard?checkout=canceled`,
+      organizationId: context.organization.id,
+      successUrl: successUrl ?? `${origin}/admin/billing?checkout=success`,
+      cancelUrl: cancelUrl ?? `${origin}/admin/billing?checkout=canceled`,
     });
 
     return NextResponse.json({ url: session.url });

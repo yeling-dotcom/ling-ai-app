@@ -47,6 +47,7 @@ export async function createCheckoutSession({
   priceId,
   customerId,
   userId,
+  organizationId,
   successUrl,
   cancelUrl,
   mode = "subscription",
@@ -54,6 +55,7 @@ export async function createCheckoutSession({
   priceId: string;
   customerId?: string;
   userId: string;
+  organizationId: string;
   successUrl: string;
   cancelUrl: string;
   mode?: "payment" | "subscription";
@@ -63,7 +65,7 @@ export async function createCheckoutSession({
     line_items: [{ price: priceId, quantity: 1 }],
     success_url: successUrl,
     cancel_url: cancelUrl,
-    metadata: { userId },
+    metadata: { userId, organizationId },
     ...(customerId
       ? { customer: customerId }
       : { customer_creation: "always" }),
@@ -72,12 +74,12 @@ export async function createCheckoutSession({
     ...(mode === "subscription" && PLATFORM_FEE_PERCENT > 0
       ? {
           subscription_data: {
-            metadata: { userId },
+            metadata: { userId, organizationId },
             application_fee_percent: PLATFORM_FEE_PERCENT,
           },
         }
       : mode === "subscription"
-      ? { subscription_data: { metadata: { userId } } }
+      ? { subscription_data: { metadata: { userId, organizationId } } }
       : {}),
 
     // One-time payment platform fee — calculated after price lookup

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireUser } from "@/lib/auth";
 import { logAudit } from "@/lib/audit";
+import { getOrganizationForUser } from "@/lib/organization";
 
 const MAX_IMAGE_SIZE = 4 * 1024 * 1024;
 const allowedImageTypes: Record<string, string> = {
@@ -13,6 +14,8 @@ const allowedImageTypes: Record<string, string> = {
 export async function POST(request: Request) {
   const { supabase, user } = await requireUser();
   if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+  const context = await getOrganizationForUser();
+  if (!context) return NextResponse.json({ error: "Organization membership required." }, { status: 403 });
 
   let formData: FormData;
   try {
@@ -50,6 +53,7 @@ export async function POST(request: Request) {
 
   const { data: publicUrl } = supabase.storage.from("images").getPublicUrl(storagePath);
   const { data, error } = await supabase.from("images").insert({
+    organization_id: context.organization.id,
     user_id: user.id,
     url: publicUrl.publicUrl,
     alt_text,
@@ -60,6 +64,6 @@ export async function POST(request: Request) {
     if (cleanupError) console.error("Failed to clean up uploaded image", cleanupError.message);
     return NextResponse.json({ error: "Image metadata could not be saved." }, { status: 500 });
   }
-  await logAudit(supabase, { action: "create", table_name: "images", row_id: data.id, actor_user_id: user.id, new_value: data });
+  await logAudit(supabase, { action: "create", table_name: "images", organization_id: context.organization.id, row_id: data.id, actor_user_id: user.id, new_value: data });
   return NextResponse.json({ image: data }, { status: 201 });
 }

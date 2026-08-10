@@ -2,18 +2,21 @@ import Image from "next/image";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { logPageView } from "@/lib/analytics";
+import { getPublicOrganization } from "@/lib/organization";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  await logPageView("/");
+  const publicOrganization = await getPublicOrganization();
+  await logPageView("/", publicOrganization?.organization.id);
   const supabase = await createClient();
-  const { data: posts, error } = await supabase
+  let query = supabase
     .from("posts")
     .select("id,title,slug,excerpt,cover_image_url,published_at")
     .eq("status", "published")
-    .is("deleted_at", null)
-    .order("published_at", { ascending: false });
+    .is("deleted_at", null);
+  if (publicOrganization) query = query.eq("organization_id", publicOrganization.organization.id);
+  const { data: posts, error } = await query.order("published_at", { ascending: false });
 
   return (
     <main>
