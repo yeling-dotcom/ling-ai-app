@@ -15,7 +15,12 @@ export function PostForm({ post }: { post?: Post }) {
   const [state, setState] = useState<"idle" | "saving" | "error">("idle");
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setState("saving");
-    const body = Object.fromEntries(new FormData(event.currentTarget));
+    const formData = new FormData(event.currentTarget);
+    // AI review fields have their own Accept/Reject actions. Do not include them
+    // in the main post save, because ai_tags is stored as a Postgres text array.
+    formData.delete("ai_summary");
+    formData.delete("ai_tags");
+    const body = Object.fromEntries(formData);
     const response = await fetch(post ? `/api/admin/posts/${post.id}` : "/api/admin/posts", { method: post ? "PATCH" : "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
     if (!response.ok) return setState("error");
     router.push("/admin/posts"); router.refresh();
