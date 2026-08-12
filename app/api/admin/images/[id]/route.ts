@@ -12,11 +12,13 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   if (!previous) return NextResponse.json({ error: "Image not found." }, { status: 404 });
   const formData = await request.formData();
   const file = formData.get("file");
+  const requestedUrl = String(formData.get("url") ?? "").trim();
   const alt_text = String(formData.get("alt_text") ?? "").trim();
   const caption = String(formData.get("caption") ?? "").trim();
-  if (alt_text.length < 2 || alt_text.length > 300 || caption.length > 1000) return NextResponse.json({ error: "Add 2–300 characters of alt text; captions may be up to 1,000 characters." }, { status: 422 });
+  if (alt_text.length < 2 || alt_text.length > 300 || caption.length < 2 || caption.length > 1000) return NextResponse.json({ error: "Add a title and 2–300 characters of alt text." }, { status: 422 });
+  if (!/^https:\/\//i.test(requestedUrl)) return NextResponse.json({ error: "Enter a valid HTTPS image URL." }, { status: 422 });
   const allowedImageTypes: Record<string, string> = { "image/gif": "gif", "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp" };
-  let nextUrl = previous.url;
+  let nextUrl = requestedUrl;
   let newStoragePath: string | null = null;
   if (file instanceof File && file.size > 0) {
     if (!allowedImageTypes[file.type]) return NextResponse.json({ error: "Upload a JPG, PNG, WebP, or GIF image." }, { status: 422 });
