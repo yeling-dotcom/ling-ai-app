@@ -6,6 +6,7 @@ export function AdminNav() {
     <Link href="/admin/posts">Posts</Link>
     <Link href="/admin/images">Images</Link>
     <Link href="/admin/videos">Videos</Link>
+    <Link href="/admin/audio">Audio</Link>
     <Link href="/admin/messages">Messages</Link>
     <Link href="/admin/analytics">Analytics</Link>
     <Link href="/admin/reviews">AI reviews</Link>
