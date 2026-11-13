@@ -31,6 +31,7 @@ export default async function RootLayout({
             <Link href="/">Journal</Link>
             {settings?.gallery_enabled !== false && <Link href="/gallery">Gallery</Link>}
             {settings?.videos_enabled !== false && <Link href="/videos">Watch</Link>}
+            <Link href="/audio">Audio</Link>
             {settings?.contact_enabled !== false && <Link href="/contact">Contact</Link>}
             <Link className="admin-link" href="/admin/posts">Studio</Link>
           </nav>
