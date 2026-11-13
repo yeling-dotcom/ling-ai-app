@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { logPageView } from "@/lib/analytics";
 import { getPublicOrganization } from "@/lib/organization";
@@ -26,7 +25,7 @@ export default async function AudioPage() {
         <article className="audio-card" key={track.id}>
           <div className="audio-cover">
             {track.thumbnail_url
-              ? <Image src={track.thumbnail_url} width={800} height={800} alt="" />
+              ? <img src={track.thumbnail_url} alt="" />
               : <span aria-hidden="true">♪</span>}
           </div>
           <div className="audio-copy">
