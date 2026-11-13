@@ -9,5 +9,5 @@ export default async function VideosAdminPage() {
   const supabase = await createClient();
   const context = await getOrganizationForUser();
   const { data } = await supabase.from("videos").select("*").eq("organization_id", context!.organization.id).is("deleted_at", null).order("created_at", { ascending: false });
-  return <main><div className="admin-shell"><AdminNav /><section><p className="eyebrow">Watch desk</p><h2>Videos</h2><p className="lede">Manage the embedded videos visitors see.</p><VideoManager initialVideos={data ?? []} /></section></div></main>;
+  return <main><div className="admin-shell"><AdminNav /><section><p className="eyebrow">Watch desk</p><h2>Videos</h2><p className="lede">Upload MP4 files or add embedded videos for visitors to watch.</p><VideoManager initialVideos={data ?? []} /></section></div></main>;
 }

@@ -16,5 +16,7 @@ export default async function VideosPage() {
   const { data: videos, error } = await query.order("created_at", { ascending: false });
   return <main><p className="eyebrow">Watch & listen</p><h1>Ideas in motion.</h1><p className="lede">Studio notes, practical walkthroughs, and conversations.</p>
     {error ? <div className="empty">Videos could not be loaded.</div> : !videos?.length ? <div className="empty">No videos yet.</div> :
-    <section className="video-grid">{videos.map(video => <article className="video-card" key={video.id}><iframe src={video.embed_url} title={video.title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen loading="lazy" /><h2>{video.title}</h2><p className="lede">{video.description}</p></article>)}</section>}</main>;
+    <section className="video-grid">{videos.map(video => <article className="video-card" key={video.id}>{video.embed_url.startsWith(`${process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "")}/storage/v1/object/public/videos/`) && video.embed_url.endsWith(".mp4")
+      ? <video src={video.embed_url} aria-label={video.title} controls playsInline preload="metadata" poster={video.thumbnail_url ?? undefined} />
+      : <iframe src={video.embed_url} title={video.title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen loading="lazy" />}<h2>{video.title}</h2><p className="lede">{video.description}</p></article>)}</section>}</main>;
 }
