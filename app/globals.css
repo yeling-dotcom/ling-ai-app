@@ -89,7 +89,7 @@ h2 { font-size: clamp(2rem, 4vw, 3.5rem); letter-spacing: -.04em; }
 .gallery-item img { width: 100%; aspect-ratio: 4/3; object-fit: cover; }
 .gallery-item figcaption { padding: 1rem; line-height: 1.5; }
 .video-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 3rem; }
-.video-card iframe { border: 0; width: 100%; aspect-ratio: 16/9; }
+.video-card iframe, .video-card video { border: 0; width: 100%; aspect-ratio: 16/9; }
 .video-card h2 { font-size: 1.7rem; }
 
 .contact-layout { display: grid; grid-template-columns: .9fr 1.1fr; gap: 5rem; align-items: start; }
