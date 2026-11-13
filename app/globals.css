@@ -92,6 +92,17 @@ h2 { font-size: clamp(2rem, 4vw, 3.5rem); letter-spacing: -.04em; }
 .video-card iframe, .video-card video { border: 0; width: 100%; aspect-ratio: 16/9; }
 .video-card h2 { font-size: 1.7rem; }
 
+.audio-grid { display: grid; gap: 1.25rem; margin-top: 3rem; max-width: 880px; }
+.audio-card { display: grid; grid-template-columns: 180px 1fr; background: var(--card); border: 1px solid var(--line); overflow: hidden; }
+.audio-cover { aspect-ratio: 1; display: grid; place-items: center; overflow: hidden; background: var(--moss); color: white; }
+.audio-cover img { width: 100%; height: 100%; object-fit: cover; }
+.audio-cover span { font-family: Georgia, serif; font-size: 4rem; }
+.audio-copy { display: grid; align-content: center; gap: .7rem; padding: 1.5rem; min-width: 0; }
+.audio-copy h2, .audio-copy p { margin: 0; }
+.audio-copy h2 { font-size: 1.8rem; }
+.audio-copy p { color: #59635d; line-height: 1.55; }
+.audio-copy audio { width: 100%; }
+
 .contact-layout { display: grid; grid-template-columns: .9fr 1.1fr; gap: 5rem; align-items: start; }
 .contact-form { background: var(--card); border: 1px solid var(--line); padding: 2rem; display: grid; gap: 1.2rem; }
 .contact-form label { display: grid; gap: .5rem; font-weight: 800; font-size: .85rem; }
@@ -172,6 +183,9 @@ footer { max-width: 1180px; margin: auto; border-top: 1px solid var(--line); pad
   nav { flex-wrap: wrap; justify-content: flex-end; gap: .7rem; }
   .post-card, .post-card:first-child { grid-column: span 12; display: block; }
   .gallery-grid, .video-grid { grid-template-columns: 1fr; }
+  .audio-card { grid-template-columns: 1fr; }
+  .audio-cover { aspect-ratio: 16/9; }
+  .audio-copy { padding: 1.2rem; }
   .contact-layout { grid-template-columns: 1fr; gap: 2rem; }
   .admin-shell { grid-template-columns: 1fr; }
   .admin-nav { position: static; grid-template-columns: repeat(2, 1fr); }
